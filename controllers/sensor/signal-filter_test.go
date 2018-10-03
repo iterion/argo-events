@@ -36,12 +36,18 @@ func Test_filterTime(t *testing.T) {
 		Start: "10:11:00",
 	}
 	event := getCloudEvent()
+
 	currentT := time.Now().UTC()
 	currentMonth := fmt.Sprintf("%d", int(currentT.Month()))
 	if int(currentT.Month()) < 10 {
 		currentMonth = "0" + currentMonth
 	}
-	currentTStr := fmt.Sprintf("%d-%s-%d", currentT.Year(), currentMonth, currentT.Day())
+	currentDay := fmt.Sprintf("%d", int(currentT.Day()))
+	if int(currentT.Day()) < 10 {
+		currentDay = "0" + currentDay
+	}
+
+	currentTStr := fmt.Sprintf("%d-%s-%s", currentT.Year(), currentMonth, currentDay)
 	parsedTime, err := time.Parse(common.StandardTimeFormat, currentTStr+" 16:36:34")
 	assert.Nil(t, err)
 	event.Context.EventTime = metav1.MicroTime{

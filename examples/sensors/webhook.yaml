@@ -9,7 +9,6 @@ spec:
   serviceAccountName: argo-events-sa
   signals:
     - name: webhook-gateway/webhook.fooConfig
-    - name: webhook-gateway/webhook.barConfig
   triggers:
     - name: hello-world-workflow-trigger
       resource:
@@ -20,7 +19,7 @@ spec:
         parameters:
           - src:
               signal: webhook-gateway/webhook.fooConfig
-              path: cusip
+              path:
             dest: spec.templates.0.container.args.0
         source:
           inline: |

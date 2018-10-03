@@ -84,7 +84,15 @@ func validateSignalFilter(filter v1alpha1.SignalFilter) error {
 
 func validateSignalTimeFilter(tFilter *v1alpha1.TimeFilter) error {
 	currentT := metav1.Time{Time: time.Now().UTC()}
-	currentTStr := fmt.Sprintf("%d-%d-%d", currentT.Year(), int(currentT.Month()), currentT.Day())
+	currentMonth := fmt.Sprintf("%d", int(currentT.Month()))
+	if int(currentT.Month()) < 10 {
+		currentMonth = "0" + currentMonth
+	}
+	currentDay := fmt.Sprintf("%d", int(currentT.Day()))
+	if int(currentT.Day()) < 10 {
+		currentDay = "0" + currentDay
+	}
+	currentTStr := fmt.Sprintf("%d-%s-%s", currentT.Year(), currentMonth, currentDay)
 	if tFilter.Start != "" && tFilter.Stop != "" {
 		startTime, err := time.Parse(common.StandardTimeFormat, currentTStr+" "+tFilter.Start)
 		if err != nil {

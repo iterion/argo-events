@@ -14,8 +14,7 @@ cd $GOPATH/src/github.com/argoproj/argo-events
 ```
 
 ## 2. Deploy Argo Events SA, ClusterRoles, ConfigMap, Sensor Controller and Gateway Controller
-Note 1: This process is manual right now, but we're working on providing a Helm chart or integrating as a Ksonnet application.
-Note 2: Modify the [argo-events-cluster-roles.yaml](../hack/k8s/manifests/argo-events-cluster-roles.yaml) file to use the correct namespace that you wish to deploy the sensor controller + signal microservices.
+Note: Modify the [argo-events-cluster-roles.yaml](../hack/k8s/manifests/argo-events-cluster-roles.yaml) file to use the correct namespace that you wish to deploy the sensor controller and gateway controller.
 ```
 kubectl apply -f hack/k8s/manifests/argo-events-sa.yaml
 kubectl apply -f hack/k8s/manifests/argo-events-cluster-roles.yaml
@@ -42,12 +41,12 @@ kubectl apply -f examples/sensors/webhook.yaml
 ```
 
 ## 6. Trigger the webhook & corresponding Argo workflow
-Trigger the webhook via sending a http POST request to `\app` endpoint. You can add different endpoint to 
+Trigger the webhook via sending a http POST request to `/foo` endpoint. You can add different endpoint to 
 gateway configuration at run time as well.
 Note: the `WEBHOOK_SERVICE_URL` will differ based on the Kubernetes cluster.
 ```
-export WEBHOOK_SERVICE_URL=$(minikube service --url webhook-svc)
-curl -d '{"message":"this is my first webhook"}' -H "Content-Type: application/json" -X POST $WEBHOOK_SERVICE_URL/app
+export WEBHOOK_SERVICE_URL=$(minikube service --url webhook-gateway-gateway-svc)
+curl -d '{"message":"this is my first webhook"}' -H "Content-Type: application/json" -X POST $WEBHOOK_SERVICE_URL/foo
 ```
 
 Verify that the Argo workflow was run when the trigger was executed.
@@ -57,15 +56,10 @@ argo list
 
 Verify that the sensor was updated correctly and moved to a "Complete" phase.
 ```
-kubectl get sensor webhook -n default -o yaml
+kubectl get sensor webhook-sensor -o yaml
 ```
 
-Check the logs of the Argo workflow pod for the message you posted.
-```
-kubectl logs arguments-via-webhook-event main
-```
-
-Check the logs of the sensor-controller pod, gateway-controller, associated gateway and sensor if there are problems.
+Check the logs of the sensor-controller pod, gateway-controller, associated gateways and sensors if there are problems.
 
 ## 7. Write your own gateway
-Now, its time to write your first gateway. Follow the tutorial [Custom Gateways](custom-gateway.md)
+Now, its time to write your first gateway. Follow the tutorial [Custom Gateways](custom-gateway.md).
